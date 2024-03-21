@@ -6,7 +6,7 @@ import numpy as np
 
 
 # # (1). Directory and device
-dir_pre = 'store/models/'
+dir_pre = 'store/models/diffae/'
 dir_figs = 'store/output/diffae/interpolate/'
 os.makedirs(dir_figs,exist_ok=True)
 
