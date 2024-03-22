@@ -8,7 +8,7 @@ pip install -r requirements.txt
 
 # Create symlink to store directory
 storage_dir="../store" # on my laptop
-storage_dir="~/Data/ddpm" # on CatScan
+#storage_dir="~/Data/ddpm" # on CatScan
 if [ ! -d "store" ]; then
 	echo "creating symlink from store to $storage_dir"
 	ln -s $storage_dir store
