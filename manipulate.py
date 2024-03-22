@@ -60,15 +60,23 @@ ax[0].imshow(ori[0].permute(1, 2, 0).cpu())
 ax[1].imshow(xT[0].permute(1, 2, 0).cpu())
 
 
-# # (5). Conditioning
+# # (5). Conditioning 
+#
+# Can I condition on multiple features? - not yet. Works fine for one.
+# Have to think carefully about what cond2 vectors look like and how
+# to combine them/
 
 print(CelebAttrDataset.id_to_cls)
-cls_str = '5_o_Clock_Shadow'
-cls_id = CelebAttrDataset.cls_to_id[cls_str]
+cls_list = ['Big_Nose'] #'Eyeglasses','Wavy_Hair'] 
 
 cond2 = cls_model.normalize(cond)
-cond2 = cond2 + 0.3 * math.sqrt(512) * F.normalize(cls_model.classifier.weight[cls_id][None, :], dim=1)
-cond2 = cls_model.denormalize(cond2)
+
+for cls_str in cls_list:
+
+    cls_id = CelebAttrDataset.cls_to_id[cls_str]
+
+    cond2 = cond2 + 0.3 * math.sqrt(512) * F.normalize(cls_model.classifier.weight[cls_id][None, :], dim=1)
+    cond2 = cls_model.denormalize(cond2)
 
 # # (6). Generate based on conditioning
 
@@ -79,12 +87,12 @@ img = model.render(xT, cond2, T=Tg)
 ori = (batch + 1) / 2
 ax[0].imshow(ori[0].permute(1, 2, 0).cpu())
 ax[1].imshow(img[0].permute(1, 2, 0).cpu())
-plt.savefig(f'{dir_figs}/compare_{cls_str}_Te{Te}_Tg{Tg}.png')
+plt.savefig(f'{dir_figs}/compare_{"-".join(cls_list)}_Te{Te}_Tg{Tg}.png')
 
 
 # # (7). Plot and save figures
 from torchvision.utils import *
-save_image(img[0], f'{dir_figs}/output_{cls_str}_Te{Te}_Tg{Tg}.png')
+save_image(img[0], f'{dir_figs}/output_{"-".join(cls_list)}_Te{Te}_Tg{Tg}.png')
 
 
 import IPython ; IPython.embed()

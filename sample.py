@@ -31,7 +31,7 @@ print(model.load_state_dict(state['state_dict'], strict=False))
 model.to(device);
 
 
-# # (3). Sample from model without conditioning
+# # (3). Unconditioned samples from model
 torch.manual_seed(4)
 Ts = 2 # was 20
 Tl = 2 # was 200
