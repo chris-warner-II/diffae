@@ -25,8 +25,11 @@ def main():
     os.makedirs(dir_figs,exist_ok=True)
 
     device = 'mps' if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else 'cpu'
-    device = 'cpu'
+    #device = 'cpu'
     print(f'Using device: {device}')
+
+    if device=='cuda':
+        os.system('nvidia_smi')
 
 
     # # (2). Setup and load in model
