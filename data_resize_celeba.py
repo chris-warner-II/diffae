@@ -79,7 +79,7 @@ if __name__ == "__main__":
     from tqdm import tqdm
 
     out_path = 'datasets/celeba.lmdb'
-    in_path = 'datasets/celeba'
+    in_path = 'store/datasets/celeba/celeba/img_align_celeba' #'datasets/celeba' (CW)
     ext = 'jpg'
     size = None
 
@@ -88,7 +88,7 @@ if __name__ == "__main__":
     dataset = ConvertDataset(dataset, size)
     loader = DataLoader(dataset,
                         batch_size=50,
-                        num_workers=12,
+                        num_workers=0, #12, (CW)
                         collate_fn=lambda x: x,
                         shuffle=False)
 
