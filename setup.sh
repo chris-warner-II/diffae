@@ -16,7 +16,16 @@ if [ ! -d "store" ]; then
 	echo "creating symlink from store to $storage_dir"
 	ln -s $storage_dir store
 fi
-# ln -s ~/Data/ddpm/datasets/diffae/datasets/ datasets # have to do this too on CatScan.
+
+
+# #Run these on Catscan
+# ln -s ~/Data/ddpm/datasets/diffae/datasets/ datasets
+# ln -s ~/Data/ddpm/models/diffae/checkpoints/ checkpoints
+
+# #Run these on Laptop
+# ln -s ../store/datasets/diffae/datasets/ datasets
+# ln -s ../store/models/diffae/checkpoints/ checkpoints
+
 
 
 # Convert .ipynb to .py to run them from commandline

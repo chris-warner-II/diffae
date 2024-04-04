@@ -13,16 +13,11 @@ if __name__ == '__main__':
 
     conf.batch_size=32 # because GPUs are running out of memory
 
-    #print(conf)
-    #import IPython ; IPython.embed()
-
-
     # # update paths to checkpoints dir with dir_pre
     # conf.pretrain.path = dir_pre + conf.pretrain.path
     # conf.latent_infer_path = dir_pre + conf.latent_infer_path
-    # #import IPython ; IPython.embed()
+    #import IPython ; IPython.embed()
 
-    #if verbose: print(f'conf =  {conf}')
     train(conf, gpus=gpus, verbose=verbose)
 
     # infer the latents for training the latent DPM

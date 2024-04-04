@@ -882,6 +882,8 @@ def train(conf: TrainConfig, gpus, nodes=1,
     #             ), 'pytorch lightning has bug with amp + gradient clipping'
     model = LitModel(conf)
 
+    #import IPython; IPython.embed()
+
     if not os.path.exists(conf.logdir):
         os.makedirs(conf.logdir)
     checkpoint = ModelCheckpoint(dirpath=f'{conf.logdir}',
