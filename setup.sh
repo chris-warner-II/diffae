@@ -1,3 +1,6 @@
+# # Make sure you are in basic conda environment with only python and pip
+# conda activate basic
+
 python -m venv env
 source env/bin/activate
 
@@ -13,6 +16,7 @@ if [ ! -d "store" ]; then
 	echo "creating symlink from store to $storage_dir"
 	ln -s $storage_dir store
 fi
+# ln -s ~/Data/ddpm/datasets/diffae/datasets/ datasets # have to do this too on CatScan.
 
 
 # Convert .ipynb to .py to run them from commandline

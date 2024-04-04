@@ -100,8 +100,7 @@ class BaseLMDB(Dataset):
             raise IOError('Cannot open lmdb dataset', path)
 
         with self.env.begin(write=False) as txn:
-            self.length = int(
-                txn.get('length'.encode('utf-8')).decode('utf-8'))
+            self.length = int( txn.get('length'.encode('utf-8')).decode('utf-8') )
 
     def __len__(self):
         return self.length

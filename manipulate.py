@@ -27,7 +27,7 @@ def main():
     os.makedirs(dir_figs,exist_ok=True)
 
     device = 'mps' if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else 'cpu'
-    #device = 'cpu'
+    device = 'cpu'
     print(f'Using device: {device}')
 
     if device=='cuda':
@@ -77,7 +77,7 @@ def main():
     ax[1].imshow(xT[0].permute(1, 2, 0).cpu())
 
 
-    # # (5). Conditioning 
+    # # (5). Conditioning
     #
     # Can I condition on multiple features? - not yet. Works fine for one.
     # Have to think carefully about what cond2 vectors look like and how
@@ -87,6 +87,8 @@ def main():
     cls_list = ['Big_Nose'] #'Eyeglasses','Wavy_Hair'] 
 
     cond2 = cls_model.normalize(cond)
+
+    import IPython ; IPython.embed()
 
     for cls_str in cls_list:
 
@@ -108,7 +110,7 @@ def main():
 
 
     # # (7). Plot and save figures
-    from torchvision.utils import *
+    from torchvision.utils import save_image #*
     save_image(img[0], f'{dir_figs}/output_{"-".join(cls_list)}_Te{args.Te}_Tr{args.Tr}.png')
 
 

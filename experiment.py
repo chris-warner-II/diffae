@@ -874,7 +874,8 @@ def is_time(num_samples, every, step_size):
     return num_samples - closest < step_size
 
 
-def train(conf: TrainConfig, gpus, nodes=1, mode: str = 'train', verbose: bool = False):
+def train(conf: TrainConfig, gpus, nodes=1, 
+          mode: str = 'train', verbose: bool = False):
     print('conf:', conf.name)
     if verbose: print(conf)
     # assert not (conf.fp16 and conf.grad_clip > 0
