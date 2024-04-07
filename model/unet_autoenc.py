@@ -148,8 +148,10 @@ class BeatGANsAutoencModel(BeatGANsUNetModel):
             if x is not None:
                 assert len(x) == len(x_start), f'{len(x)} != {len(x_start)}'
 
-            tmp = self.encode(x_start)
-            cond = tmp['cond']
+            # BUG FIX (CW)
+            #tmp = self.encode(x_start)
+            #cond = tmp['cond']
+            cond = self.encode(x_start)
 
         if t is not None:
             _t_emb = timestep_embedding(t, self.conf.model_channels)
