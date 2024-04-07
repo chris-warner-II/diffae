@@ -84,7 +84,7 @@ class BeatGANsAutoencModel(BeatGANsUNetModel):
 
     def encode(self, x):
         cond = self.encoder.forward(x)
-        return {'cond': cond}
+        return cond # {'cond': cond}
 
     @property
     def stylespace_sizes(self):
