@@ -10,6 +10,7 @@ if __name__ == '__main__':
     if verbose: print('Train ffhq128 autoenc model.')
     gpus = [0, 1, 2, 3]
     conf = ffhq128_autoenc_130M()
+    print(f'Conf.batch_size: {conf.batch_size}')
     train(conf, gpus=gpus, verbose=verbose)
 
     # infer the latents for training the latent DPM
