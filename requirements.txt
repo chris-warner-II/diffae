@@ -15,6 +15,7 @@ lmdb==1.2.1
 ftfy
 regex
 
+pillow==9.5.0
 jupyter
 matplotlib
 tensorboard
