@@ -1,31 +1,24 @@
 # # Make sure you are in basic conda environment with only python and pip
-# conda activate basic
+# conda activate basic_py3.9
 
-python -m venv env
-source env/bin/activate
+# #Run these on Catscan
+# ln -s ~/Data/ddpm store
+# ln -s ~/Data/ddpm/datasets/diffae/datasets/ datasets
+# ln -s ~/Data/ddpm/models/diffae/checkpoints/ checkpoints
+# ln -s ~/.cache ~/Data/.cache
+
+# #Run these on Laptop
+# ln -s ../store store
+# ln -s ../store/datasets/diffae/datasets/ datasets
+# ln -s ../store/models/diffae/checkpoints/ checkpoints
+
+
+python -m venv store/venv/diffae
+source store/venv/diffae/bin/activate
 
 pip install --upgrade pip
 
 pip install -r requirements.txt
-
-
-## Create symlink to store directory
-#storage_dir="../store" # on my laptop
-##storage_dir="~/Data/ddpm" # on CatScan
-#if [ ! -d "store" ]; then
-#	echo "creating symlink from store to $storage_dir"
-#	ln -s $storage_dir store
-#fi
-
-# #Run these on Catscan
-# ln -s ~/Data/ddpm/datasets/diffae/datasets/ datasets
-# ln -s ~/Data/ddpm/models/diffae/checkpoints/ checkpoints
-# MIGHT HAVE TO. BUT NOT YET. # ln -s ~/.cache ~/Data/.cache
-
-# #Run these on Laptop
-# ln -s ../store/datasets/diffae/datasets/ datasets
-# ln -s ../store/models/diffae/checkpoints/ checkpoints
-
 
 
 # Convert .ipynb to .py to run them from commandline
