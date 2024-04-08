@@ -1,15 +1,17 @@
-							# Recommended
-pytorch-lightning==1.4.5	# ==1.4.5
-torchmetrics==0.5.0 		# ==0.5.0
-torch 						# ==1.8.1
+# Need to use older version of Python in Conda environment
+# Python 3.7.16 - try 3.8 !!!
+
+pytorch-lightning==1.4.5
+torchmetrics==0.5.0
+torch==1.8.1
 torchvision	
-scipy 						# ==1.5.4
-numpy 						# ==1.19.5
+scipy==1.5.4
+numpy==1.19.5
 tqdm
-pytorch-fid 				# ==0.2.0
-pandas 						# ==1.1.5
-lpips 						# ==0.1.4
-lmdb 						# ==1.2.1
+pytorch-fid==0.2.0
+pandas==1.1.5
+lpips==0.1.4
+lmdb==1.2.1
 ftfy
 regex
 

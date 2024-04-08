@@ -9,18 +9,18 @@ pip install --upgrade pip
 pip install -r requirements.txt
 
 
-# Create symlink to store directory
-storage_dir="../store" # on my laptop
-#storage_dir="~/Data/ddpm" # on CatScan
-if [ ! -d "store" ]; then
-	echo "creating symlink from store to $storage_dir"
-	ln -s $storage_dir store
-fi
-
+## Create symlink to store directory
+#storage_dir="../store" # on my laptop
+##storage_dir="~/Data/ddpm" # on CatScan
+#if [ ! -d "store" ]; then
+#	echo "creating symlink from store to $storage_dir"
+#	ln -s $storage_dir store
+#fi
 
 # #Run these on Catscan
 # ln -s ~/Data/ddpm/datasets/diffae/datasets/ datasets
 # ln -s ~/Data/ddpm/models/diffae/checkpoints/ checkpoints
+# MIGHT HAVE TO. BUT NOT YET. # ln -s ~/.cache ~/Data/.cache
 
 # #Run these on Laptop
 # ln -s ../store/datasets/diffae/datasets/ datasets
