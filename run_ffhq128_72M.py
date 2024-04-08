@@ -10,14 +10,6 @@ if __name__ == '__main__':
     if verbose: print('Train ffhq128 autoenc 72M model.')
     gpus = [0, 1, 2, 3]
     conf = ffhq128_autoenc_72M()
-
-    conf.batch_size=32 # because GPUs are running out of memory
-
-    # # update paths to checkpoints dir with dir_pre
-    # conf.pretrain.path = dir_pre + conf.pretrain.path
-    # conf.latent_infer_path = dir_pre + conf.latent_infer_path
-    #import IPython ; IPython.embed()
-
     train(conf, gpus=gpus, verbose=verbose)
 
     # infer the latents for training the latent DPM
