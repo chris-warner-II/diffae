@@ -4,7 +4,7 @@
 pytorch-lightning==1.4.5
 torchmetrics==0.5.0
 torch==1.8.1
-torchvision	
+torchvision
 scipy==1.5.4
 numpy==1.19.5
 tqdm
@@ -20,3 +20,4 @@ pillow==9.5.0
 jupyter
 matplotlib
 tensorboard
+torchinfo

@@ -882,7 +882,51 @@ def train(conf: TrainConfig, gpus, nodes=1,
     #             ), 'pytorch lightning has bug with amp + gradient clipping'
     model = LitModel(conf)
 
-    #import IPython; IPython.embed()
+    if True:
+        # CW add break here to dig into model
+        import IPython; IPython.embed()
+
+        for name, module in model.named_modules():
+            print(f"Name: {name}")
+            # model
+            # model.time_embed.time_embed       <-- 3
+            # model.time_embed.style            <-- 1
+            # model.input_blocks                <-- 11
+            # model.middle_block                <-- 3
+            # model.output_blocks               <-- 11
+            # model.out                         <-- 3
+            #
+            # model.encoder.input_blocks        <-- 14
+            # model.encoder.middle_block        <-- 3
+            # model.encoder.out                 <-- 5
+            #
+            # ema_model
+            # ema_model.time_embed.time_embed   <-- 3
+            # ema_model.time_embed.style        <-- 1
+            # ema_model.input_blocks            <-- 11
+            # ema_model.middle_block            <-- 3
+            # ema_model.output_blocks           <-- 11
+            # ema_model.out                     <-- 3
+            #
+            # ema_model.encoder.input_blocks    <-- 14
+            # ema_model.encoder.middle_block    <-- 3
+            # ema_model.encoder.out             <-- 5
+            #
+            # NOTE 1: input_blocks, middle block & output_blocks
+            #       all have 2 "emb_layers" and 2 "cond_emb_layers"
+            #
+            # NOTE 2: model & ema_model seem to mirror each other.
+
+        from torchinfo import summary
+        summary(model, input_size=(128,3,64,64))
+
+        # for name in model.children():
+        #     print(f"Name: {name}")
+        #
+        # for name in model.model.input_blocks.children():
+        #     print(f"Name: {name}")
+
+
 
     if not os.path.exists(conf.logdir):
         os.makedirs(conf.logdir)

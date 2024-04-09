@@ -9,6 +9,7 @@ if __name__ == '__main__':
     # this can be run on 2080Ti's.
     gpus = [0, 1, 2, 3]
     conf = celeba64d2c_autoenc()
+    #import IPython; IPython.embed()
     train(conf, gpus=gpus, verbose=verbose)
 
     # infer the latents for training the latent DPM
