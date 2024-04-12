@@ -1,5 +1,5 @@
 # # Make sure you are in basic conda environment with only python and pip
-# conda activate basic_py3.9
+conda activate basic_py3.9
 
 # #Run these on Catscan
 # ln -s ~/Data/ddpm store
@@ -15,9 +15,7 @@
 
 python -m venv store/venv/diffae
 source store/venv/diffae/bin/activate
-
 pip install --upgrade pip
-
 pip install -r requirements.txt
 
 

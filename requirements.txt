@@ -21,3 +21,4 @@ jupyter
 matplotlib
 tensorboard
 torchinfo
+h5py
