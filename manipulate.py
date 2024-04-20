@@ -26,7 +26,7 @@ def main():
     dir_figs = 'store/output/diffae/manipulate/'
     os.makedirs(dir_figs,exist_ok=True)
 
-    device = 'mps' if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else 'cpu'
+    #device = 'cuda' if torch.cuda.is_available() else 'cpu'
     device = 'cpu'
     print(f'Using device: {device}')
 
@@ -83,6 +83,8 @@ def main():
     # Have to think carefully about what cond2 vectors look like and how
     # to combine them/
 
+
+
     print(CelebAttrDataset.id_to_cls)
     cls_list = ['Big_Nose'] #'Eyeglasses','Wavy_Hair'] 
 
@@ -114,7 +116,7 @@ def main():
     save_image(img[0], f'{dir_figs}/output_{"-".join(cls_list)}_Te{args.Te}_Tr{args.Tr}.png')
 
 
-    #import IPython ; IPython.embed()
+    # import IPython ; IPython.embed()
 
 
 if __name__ == "__main__":

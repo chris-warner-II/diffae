@@ -105,6 +105,8 @@ if __name__ == "__main__":
     print(f'There are {len(dataset)} celeba images.')
     print(f'There are {len(h5f.keys())} embedding vectors.')
 
+    #import IPython; IPython.embed()
+
     with lmdb.open(target, map_size=1024**4, readahead=False) as env:
         with tqdm(total=len(dataset)) as progress:
             i = 0
@@ -112,16 +114,21 @@ if __name__ == "__main__":
             for batch in loader:
                 with env.begin(write=True) as txn:
                     for img in batch:
-                        key = f"{size}-{str(i).zfill(6)}".encode("utf-8") # was zfill(7) CW
+
+                        key = f"{size}-{str(i).zfill(7)}".encode("utf-8")
+                        key_embed = f"{size}-{str(i).zfill(7)}-embed".encode("utf-8")
                         # print(key)
                         file_name=f'{str(i).zfill(6)}.jpg'
                         try:
                             embed = np.array(h5f[file_name]['embedding']).tobytes()
-                            txn.put(key, img, embed)
                         except:
                             #print(f'Failed on file {file_name}')
+                            embed = np.zeros(512, dtype=np.float32).tobytes()
                             fails_cnt+=1
-                            pass
+
+                        txn.put(key, img)
+                        txn.put(key_embed, embed)
+
                         i += 1
                         progress.update()
 

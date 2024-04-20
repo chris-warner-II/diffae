@@ -97,6 +97,10 @@ class SpacedDiffusionBeatGans(GaussianDiffusionBeatGans):
                                        **kwargs)
 
     def training_losses(self, model: Model, *args, **kwargs):  # pylint: disable=signature-differs
+
+        print('Inside diffusion.SpacedDiffusionBeatGans.training_losses')
+        #import IPython; IPython.embed()
+
         return super().training_losses(self._wrap_model(model), *args,
                                        **kwargs)
 
@@ -133,9 +137,12 @@ class _WrappedModel:
     def forward(self, x, t, t_cond=None, **kwargs):
         """
         Args:
-            t: t's with differrent ranges (can be << T due to smaller eval T) need to be converted to the original t's
+            t: t's with different ranges (can be << T due to smaller eval T) need to be converted to the original t's
             t_cond: the same as t but can be of different values
         """
+
+        print('Inside class _WrappedModel function forward')
+
         map_tensor = th.tensor(self.timestep_map,
                                device=t.device,
                                dtype=t.dtype)

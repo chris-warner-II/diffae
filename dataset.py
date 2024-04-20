@@ -9,6 +9,7 @@ from torchvision import transforms
 from torchvision.datasets import CIFAR10, LSUNClass
 import torch
 import pandas as pd
+import numpy as np
 
 import torchvision.transforms.functional as Ftrans
 
@@ -114,6 +115,55 @@ class BaseLMDB(Dataset):
         buffer = BytesIO(img_bytes)
         img = Image.open(buffer)
         return img
+
+class BaseLMDB_array(Dataset):
+    # CW adapted from BaseLMDB for array (not image) data saved as bytes.
+    def __init__(self, path, original_resolution, zfill: int = 5):
+        self.original_resolution = original_resolution
+        self.zfill = zfill
+        self.env = lmdb.open(
+            path,
+            max_readers=32,
+            readonly=True,
+            lock=False,
+            readahead=False,
+            meminit=False,
+        )
+
+        if not self.env:
+            raise IOError('Cannot open lmdb dataset', path)
+
+        with self.env.begin(write=False) as txn:
+            self.length = int(txn.get('length'.encode('utf-8')).decode('utf-8'))
+
+    def __len__(self):
+        return self.length
+
+    def __getitem__(self, index):
+        with (self.env.begin(write=False) as txn):
+            #print(index)
+            key = f'{self.original_resolution}-{str(index).zfill(self.zfill)}'.encode(
+                'utf-8')
+            key_embed = f'{self.original_resolution}-{str(index).zfill(self.zfill)}-embed'.encode(
+                'utf-8')
+
+            embed_bytes = txn.get(key_embed)
+            embed = np.frombuffer(embed_bytes, dtype=np.float32)
+            # Hardcoding float32 for now. May want to pass that in at some point.
+            #embed_c = embed.copy()
+            #embed_c.setflags(write=True)
+
+            print(embed.shape, embed[:10])
+
+
+            #print('In dataset get item')
+            #import IPython; IPython.embed()
+
+            img_bytes = txn.get(key)
+            buffer = BytesIO(img_bytes)
+            img = Image.open(buffer)
+            return img, torch.tensor(embed)
+
 
 
 def make_transform(
@@ -270,6 +320,72 @@ class CelebAlmdb(Dataset):
         if self.transform is not None:
             img = self.transform(img)
         return {'img': img, 'index': index}
+
+
+class CelebA_attrib_lmdb(Dataset):
+    """
+    Adapted from CelebAlmdb above by Chris W
+    also supports for d2c crop.
+    """
+    def __init__(self,
+                 path,
+                 image_size,
+                 original_resolution=128,
+                 split=None,
+                 as_tensor: bool = True,
+                 do_augment: bool = True,
+                 do_normalize: bool = True,
+                 crop_d2c: bool = False,
+                 **kwargs):
+        self.original_resolution = original_resolution
+        self.data = BaseLMDB_array(path, original_resolution, zfill=7)
+        self.length = len(self.data)
+        self.crop_d2c = crop_d2c
+
+        if split is None:
+            self.offset = 0
+        else:
+            raise NotImplementedError()
+
+        if crop_d2c:
+            transform = [
+                d2c_crop(),
+                transforms.Resize(image_size),
+            ]
+        else:
+            transform = [
+                transforms.Resize(image_size),
+                transforms.CenterCrop(image_size),
+            ]
+
+        if do_augment:
+            transform.append(transforms.RandomHorizontalFlip())
+        if as_tensor:
+            transform.append(transforms.ToTensor())
+        if do_normalize:
+            transform.append(
+                transforms.Normalize((0.5, 0.5, 0.5), (0.5, 0.5, 0.5)))
+        self.transform = transforms.Compose(transform)
+
+    def __len__(self):
+        return self.length
+
+    def __getitem__(self, index):
+        assert index < self.length
+        index = index + self.offset
+
+        #print('in celeba attr dataset get item')
+        #import IPython; IPython.embed()
+
+        img = self.data[index][0]
+        embed = self.data[index][1]
+
+        if img is None:
+            return {'img': img, 'embed': embed, 'index': index}
+
+        if self.transform is not None:
+            img = self.transform(img)
+        return {'img': img, 'embed': embed,'index': index}
 
 
 class Horse_lmdb(Dataset):

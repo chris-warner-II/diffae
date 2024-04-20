@@ -24,8 +24,8 @@ def main():
     dir_figs = 'store/output/diffae/interpolate/'
     os.makedirs(dir_figs,exist_ok=True)
 
-    device = 'mps' if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else 'cpu'
-    #device = 'cpu'
+    #device = 'mps' if torch.backends.mps.is_available() else 'cuda' if torch.cuda.is_available() else 'cpu'
+    device = 'cpu'
     print(f'Using device: {device}')
 
     if device=='cuda':
@@ -74,6 +74,8 @@ def main():
 
     alpha = torch.tensor(np.linspace(0, 1, 10, dtype=np.float32)).to(cond.device)
     intp = cond[0][None] * (1 - alpha[:, None]) + cond[1][None] * alpha[:, None]
+
+    import IPython; IPython.embed()
 
     def cos(a, b):
         a = a.view(-1)
