@@ -10,7 +10,7 @@ if __name__ == '__main__':
     gpus = [0, 1, 2, 3]
     conf = celeba64d2c_autoenc()
     #
-    #conf.batch_size = 32
+    conf.batch_size = 32
     conf.data_name = 'celebaattriblmdb'
     #
     #import IPython; IPython.embed()
