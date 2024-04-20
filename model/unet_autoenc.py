@@ -155,7 +155,7 @@ class BeatGANsAutoencModel(BeatGANsUNetModel):
             # BUG FIX from repo issue (CW)
             #tmp = self.encode(x_start)
             #cond = tmp['cond']
-            cond = self.encode(x_start) + kwargs['embed']*0.00001
+            cond = self.encode(x_start) + kwargs['embed']*0.01
 
             #print('Inside unet_autoenc.BeatGANsAutoencModel.forward')
             #import IPython; IPython.embed()

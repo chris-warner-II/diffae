@@ -420,7 +420,7 @@ class LitModel(pl.LightningModule):
             #print('Inside Training_step')
             #import IPython; IPython.embed()
 
-            print(f'self.conf.train_mode = {self.conf.train_mode}')
+            #print(f'self.conf.train_mode = {self.conf.train_mode}')
             if self.conf.train_mode == TrainMode.diffusion:
                 """
                 main training mode!!!
