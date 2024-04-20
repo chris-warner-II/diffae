@@ -153,7 +153,7 @@ class BaseLMDB_array(Dataset):
             #embed_c = embed.copy()
             #embed_c.setflags(write=True)
 
-            print(embed.shape, embed[:10])
+            #print(embed.shape, embed[:10])
 
 
             #print('In dataset get item')

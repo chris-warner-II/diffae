@@ -427,13 +427,13 @@ class LitModel(pl.LightningModule):
                 """
                 # with numpy seed we have the problem that the sample t's are related!
                 t, weight = self.T_sampler.sample(len(x_start), x_start.device)
-                print('Entering sampler.training_losses from experiment.py')
-                print(f'self.sampler = {self.sampler}')
+                #print('Entering sampler.training_losses from experiment.py')
+                #print(f'self.sampler = {self.sampler}')
                 losses = self.sampler.training_losses(model=self.model,
                                                       x_start=x_start,
                                                       t=t,
                                                       model_kwargs=kwargs)
-                print('After sampler.training_losses from experiment.py')
+                #print('After sampler.training_losses from experiment.py')
                 #import IPython; IPython.embed()
 
             elif self.conf.train_mode.is_latent_diffusion():
@@ -466,8 +466,8 @@ class LitModel(pl.LightningModule):
                         self.logger.experiment.add_scalar(
                             f'loss/{key}', losses[key], self.num_samples)
 
-        print('Exiting LitModel.training_step in experiment.py')
-        print('     ')
+        #print('Exiting LitModel.training_step in experiment.py')
+        #print('     ')
         return {'loss': loss}
 
     def on_train_batch_end(self, outputs, batch, batch_idx: int,
@@ -475,7 +475,7 @@ class LitModel(pl.LightningModule):
         """
         after each training step ...
         """
-        print('Inside on_train_batch_end in experiment.py')
+        #print('Inside on_train_batch_end in experiment.py')
         #import IPython; IPython.embed()
 
         if self.is_last_accum(batch_idx):
@@ -499,11 +499,11 @@ class LitModel(pl.LightningModule):
                 embed = batch['embed']
                 model_kwargs = {'embed':embed}
 
-            print('Entering LitModel.log_sample')
+            #print('Entering LitModel.log_sample')
             self.log_sample(x_start=imgs, model_kwargs=model_kwargs)
             self.evaluate_scores()
-            print('Exiting on_train_batch_end in experiment.py')
-            print('    ')
+            #print('Exiting on_train_batch_end in experiment.py')
+            #print('    ')
 
     def on_before_optimizer_step(self, optimizer: Optimizer,
                                  optimizer_idx: int) -> None:
@@ -531,7 +531,7 @@ class LitModel(pl.LightningModule):
                interpolate=False,
                model_kwargs=None):
 
-            print('Inside LitModel.log_sample.do in experiment.py')
+            #print('Inside LitModel.log_sample.do in experiment.py')
             #import IPython; IPython.embed()
 
             model.eval()
@@ -575,10 +575,10 @@ class LitModel(pl.LightningModule):
                                     i = torch.randperm(len(cond))
                                     cond = (cond + cond[i]) / 2
                             else:
-                                print('Enter else statement, set cond=None')
+                                #print('Enter else statement, set cond=None')
                                 cond = None
 
-                        print('Entering diffusion.diffusion.SpacedDiffusionBeatGans.super().sample')
+                        #print('Entering diffusion.diffusion.SpacedDiffusionBeatGans.super().sample')
                         # can pass in model_kwargs to sample
                         gen = self.eval_sampler.sample(model=model,
                                                        noise=x_T,
@@ -619,7 +619,7 @@ class LitModel(pl.LightningModule):
                                                      self.num_samples)
             model.train()
 
-        print('Inside LitModel.log_sample')
+        #print('Inside LitModel.log_sample')
         #import IPython; IPython.embed()
 
         if self.conf.sample_every_samples > 0 and is_time(
@@ -655,12 +655,12 @@ class LitModel(pl.LightningModule):
                        use_xstart=True,
                        save_real=True)
                 else:
-                    print('Entering else statement in LitModel.log_sample')
-                    print('Entering log_sample do self.model')
+                    #print('Entering else statement in LitModel.log_sample')
+                    #print('Entering log_sample do self.model')
                     do(self.model, '', use_xstart=True, save_real=True, model_kwargs=model_kwargs)
-                    print('Entering log_sample do self.ema_model')
+                    #print('Entering log_sample do self.ema_model')
                     do(self.ema_model, '_ema', use_xstart=True, save_real=True, model_kwargs=model_kwargs)
-                    print('Exiting LitModel.logsample')
+                    #print('Exiting LitModel.logsample')
 
     def evaluate_scores(self):
         """
@@ -968,7 +968,7 @@ def is_time(num_samples, every, step_size):
 
 def train(conf: TrainConfig, gpus, nodes=1, 
           mode: str = 'train', verbose: bool = False):
-    print('conf:', conf.name)
+    #print('conf:', conf.name)
     if verbose: print(conf)
     # assert not (conf.fp16 and conf.grad_clip > 0
     #             ), 'pytorch lightning has bug with amp + gradient clipping'
@@ -1060,28 +1060,28 @@ def train(conf: TrainConfig, gpus, nodes=1,
         plugins.append(DDPPlugin(find_unused_parameters=False))
 
 
-    # # SETUP TO USE PL.TRAINER ON CPU FOR DEBUGGING.
-    # trainer = pl.Trainer(fast_dev_run=True,
-    #                      log_every_n_steps=1)
+    # SETUP TO USE PL.TRAINER ON CPU FOR DEBUGGING.
+    trainer = pl.Trainer(fast_dev_run=True,
+                         log_every_n_steps=1)
 
-    # THIS WORKS RIGHT HERE...
-    trainer = pl.Trainer(
-        max_steps=conf.total_samples // conf.batch_size_effective,
-        resume_from_checkpoint=resume,
-        gpus=gpus,
-        num_nodes=nodes,
-        accelerator=accelerator,
-        precision=16 if conf.fp16 else 32,
-        callbacks=[
-            checkpoint,
-            LearningRateMonitor(),
-        ],
-        # gradient_clip_val=conf.grad_clip,
-        replace_sampler_ddp=True,
-        logger=tb_logger,
-        accumulate_grad_batches=conf.accum_batches,
-        plugins=plugins,
-    )
+    # # THIS WORKS RIGHT HERE...
+    # trainer = pl.Trainer(
+    #     max_steps=conf.total_samples // conf.batch_size_effective,
+    #     resume_from_checkpoint=resume,
+    #     gpus=gpus,
+    #     num_nodes=nodes,
+    #     accelerator=accelerator,
+    #     precision=16 if conf.fp16 else 32,
+    #     callbacks=[
+    #         checkpoint,
+    #         LearningRateMonitor(),
+    #     ],
+    #     # gradient_clip_val=conf.grad_clip,
+    #     replace_sampler_ddp=True,
+    #     logger=tb_logger,
+    #     accumulate_grad_batches=conf.accum_batches,
+    #     plugins=plugins,
+    # )
 
     #print('After trainer & model.setup(), before trainer.fit')
     #model.setup() # loads training data from lmdb added by CW for errorchecking.
