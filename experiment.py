@@ -1060,28 +1060,28 @@ def train(conf: TrainConfig, gpus, nodes=1,
         plugins.append(DDPPlugin(find_unused_parameters=False))
 
 
-    # SETUP TO USE PL.TRAINER ON CPU FOR DEBUGGING.
-    trainer = pl.Trainer(fast_dev_run=True,
-                         log_every_n_steps=1)
+    # # SETUP TO USE PL.TRAINER ON CPU FOR DEBUGGING.
+    # trainer = pl.Trainer(fast_dev_run=True,
+    #                      log_every_n_steps=1)
 
-    # # THIS WORKS RIGHT HERE...
-    # trainer = pl.Trainer(
-    #     max_steps=conf.total_samples // conf.batch_size_effective,
-    #     resume_from_checkpoint=resume,
-    #     gpus=gpus,
-    #     num_nodes=nodes,
-    #     accelerator=accelerator,
-    #     precision=16 if conf.fp16 else 32,
-    #     callbacks=[
-    #         checkpoint,
-    #         LearningRateMonitor(),
-    #     ],
-    #     # gradient_clip_val=conf.grad_clip,
-    #     replace_sampler_ddp=True,
-    #     logger=tb_logger,
-    #     accumulate_grad_batches=conf.accum_batches,
-    #     plugins=plugins,
-    # )
+    # THIS WORKS RIGHT HERE...
+    trainer = pl.Trainer(
+        max_steps=conf.total_samples // conf.batch_size_effective,
+        resume_from_checkpoint=resume,
+        gpus=gpus,
+        num_nodes=nodes,
+        accelerator=accelerator,
+        precision=16 if conf.fp16 else 32,
+        callbacks=[
+            checkpoint,
+            LearningRateMonitor(),
+        ],
+        # gradient_clip_val=conf.grad_clip,
+        replace_sampler_ddp=True,
+        logger=tb_logger,
+        accumulate_grad_batches=conf.accum_batches,
+        plugins=plugins,
+    )
 
     #print('After trainer & model.setup(), before trainer.fit')
     #model.setup() # loads training data from lmdb added by CW for errorchecking.
