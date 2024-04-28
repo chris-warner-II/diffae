@@ -142,10 +142,8 @@ class BaseLMDB_array(Dataset):
     def __getitem__(self, index):
         with (self.env.begin(write=False) as txn):
             #print(index)
-            key = f'{self.original_resolution}-{str(index).zfill(self.zfill)}'.encode(
-                'utf-8')
-            key_embed = f'{self.original_resolution}-{str(index).zfill(self.zfill)}-embed'.encode(
-                'utf-8')
+            key = f'{self.original_resolution}-{str(index).zfill(self.zfill)}'.encode('utf-8')
+            key_embed = f'{self.original_resolution}-{str(index).zfill(self.zfill)}-embedding'.encode('utf-8')
 
             embed_bytes = txn.get(key_embed)
             embed = np.frombuffer(embed_bytes, dtype=np.float32)

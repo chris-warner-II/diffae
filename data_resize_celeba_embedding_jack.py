@@ -14,8 +14,11 @@ from torch.utils.data import DataLoader, Dataset
 from torchvision.datasets import LSUNClass
 from torchvision.transforms import functional as trans_fn
 from tqdm import tqdm
-import h5py
 import numpy as np
+
+import h5py
+
+h5_path = '/home/jack/ddpm/store/datasets/celeba_addendum/attributes_insight.hdf5'
 
 
 def resize_and_convert(img, size, resample, quality=100):
@@ -57,9 +60,9 @@ class ConvertDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, index):
-        img = self.data[index]
+        img, embedding = self.data[index]
         bytes = resize_and_convert(img, self.size, Image.LANCZOS, quality=100)
-        return bytes
+        return bytes, embedding
 
 
 class ImageFolder(Dataset):
@@ -77,19 +80,40 @@ class ImageFolder(Dataset):
         return img
 
 
-if __name__ == "__main__":
+class ImageAttributeFolder(Dataset):
+    def __init__(self, folder, ext='jpg'):
+        super().__init__()
+        self.attr = h5py.File(h5_path)
+        self.folder = folder
+        self.file_names = sorted(list(self.attr.keys()))
 
-    out_path = 'datasets/celeba_attrib.lmdb'
-    in_path = 'store/datasets/celeba/celeba/img_align_celeba' #'datasets/celeba' (CW)
+    def __len__(self):
+        return len(self.file_names)
+
+    def __getitem__(self, index):
+        file_name = self.file_names[index]
+        path = self.folder + '/' + file_name
+        img = Image.open(path)
+        embedding = self.attr[file_name]['embedding']
+        return img, embedding
+
+
+if __name__ == "__main__":
+    from tqdm import tqdm
+
+    out_path = 'datasets/celeba.lmdb'
+    out_path = 'datasets/celeba_embeddings_v2.lmdb'
+    in_path = 'datasets/celeba/celeba/img_align_celeba'
     ext = 'jpg'
     size = None
 
-    dataset = ImageFolder(in_path, ext)
+    #dataset = ImageFolder(in_path, ext)
+    dataset = ImageAttributeFolder(in_path, ext)
     print('len:', len(dataset))
     dataset = ConvertDataset(dataset, size)
     loader = DataLoader(dataset,
-                        batch_size=50,
-                        num_workers=0, #12, (CW)
+                        batch_size=10,
+                        num_workers=0,
                         collate_fn=lambda x: x,
                         shuffle=False)
 
@@ -97,47 +121,39 @@ if __name__ == "__main__":
     if os.path.exists(target):
         shutil.rmtree(target)
 
-    # Load inattributes_insight.hdf5 file
-    h5_file = 'store/datasets/celeba_addendum/attributes_insight.hdf5'
-    print(f"Loading {h5_file}")
-    h5f = h5py.File(h5_file, 'r')
-
-    print(f'There are {len(dataset)} celeba images.')
-    print(f'There are {len(h5f.keys())} embedding vectors.')
-
-    #import IPython; IPython.embed()
-
     with lmdb.open(target, map_size=1024**4, readahead=False) as env:
         with tqdm(total=len(dataset)) as progress:
-            i = 0
-            fails_cnt=0
+            b = 0
             for batch in loader:
                 with env.begin(write=True) as txn:
-                    for img in batch:
-
+                    j = 0
+                    for p in batch:
+                        i = b*len(batch)+j
+                        img, embedding = p
                         key = f"{size}-{str(i).zfill(7)}".encode("utf-8")
-                        key_embed = f"{size}-{str(i).zfill(7)}-embedding".encode("utf-8")
                         # print(key)
-                        file_name=f'{str(i).zfill(6)}.jpg'
-                        try:
-                            embed = np.array(h5f[file_name]['embedding']).tobytes()
-                        except:
-                            #print(f'Failed on file {file_name}')
-                            embed = np.zeros(512, dtype=np.float32).tobytes()
-                            fails_cnt+=1
-
                         txn.put(key, img)
-                        txn.put(key_embed, embed)
 
-                        i += 1
+                        embedding = np.array(embedding)
+                        embedding_bytes = np.array(embedding).tobytes()
+                        key = f"{size}-{str(i).zfill(7)}-embedding".encode("utf-8")
+                        # print(key)
+                        print(key, embedding.sum(), embedding[:4])
+                        txn.put(key, embedding_bytes)
+                        j += 1
                         progress.update()
 
-                # if i == 1000:
-                #     break
-                # if total == len(imgset):
-                #     break
+                with env.begin(write=False) as txn:
+                    j = 0
+                    for p in batch:
+                        i = b*len(batch)+j
+                        key = f"{size}-{str(i).zfill(7)}-embedding".encode("utf-8")
+                        embedding_bytes = txn.get(key)
+                        embedding = np.frombuffer(embedding_bytes, dtype=np.float32)
+                        print(key, embedding.sum(), embedding[:4])
+                        j += 1
+                import IPython ; IPython.embed()
+                b += 1
 
         with env.begin(write=True) as txn:
             txn.put("length".encode("utf-8"), str(i).encode("utf-8"))
-
-        print(f'Failed on {fails_cnt}/{len(dataset)} files.')

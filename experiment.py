@@ -1056,10 +1056,9 @@ def train(conf: TrainConfig, gpus, nodes=1,
         plugins.append(DDPPlugin(find_unused_parameters=False))
 
 
-    model.setup() # loads training data from lmdb added by CW for errorchecking.
+    #model.setup() # loads training data from lmdb added by CW for errorchecking.
 
-
-    # Q:CW: What are the statistics for dynamic range of insightface attrib embeddings? (looks fine)
+    # Q1:CW: What are the statistics for dynamic range of insightface attrib embeddings? (looks fine)
     if False:
         print('Gathering statistics on dynamic range of id vector embeddings')
         import matplotlib.pyplot as plt
@@ -1125,10 +1124,7 @@ def train(conf: TrainConfig, gpus, nodes=1,
         plt.suptitle('Diffae Zsem ID Vectors')
         plt.savefig('store/output/diffae/conditioning/zsem_idvec_dr.png')
 
-    #import IPython; IPython.embed()
-
-
-    # Q:CW Do vectors in hdf5 file match corresponding vectors in model.train_data?
+    # Q2:CW Do vectors in hdf5 file match corresponding vectors in model.train_data?
     if False:
         import h5py
         from PIL import Image
@@ -1144,11 +1140,15 @@ def train(conf: TrainConfig, gpus, nodes=1,
             identity_embeddings[file_name] = np.array(f[file_name]['embedding'])
             landmarks_list.append(landmarks[file_name].reshape(1, -1))
             identity_embedding_list.append(identity_embeddings[file_name].reshape(1, -1))
+            # difference between id vector in hdf5 and in model.train_data (loaded from lmdb)
+            diff = (model.train_data.data[i][1] - identity_embedding_list[i]).sum().item()
+            print(i,diff)
+
             if i>10:
                 break
         f.close()
 
-
+    #import IPython; IPython.embed()
 
 
 
