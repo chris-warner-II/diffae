@@ -162,7 +162,7 @@ class BaseLMDB_array(Dataset):
             img_bytes = txn.get(key)
             buffer = BytesIO(img_bytes)
             img = Image.open(buffer)
-            return img, torch.tensor(embed)
+            return img, torch.tensor(embed), index
 
 
 

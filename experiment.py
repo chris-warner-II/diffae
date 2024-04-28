@@ -410,11 +410,7 @@ class LitModel(pl.LightningModule):
                 if 'embed' in batch.keys():
                     embed = batch['embed']
                     kwargs = { "embed": embed }
-                    # cond_kwargs = {'model_kwargs':
-                    #                     { "embed": embed } # nested dictionary?
-                    #                }
                 else:
-                    #cond_kwargs=None
                     kwargs=None
 
             #print('Inside Training_step')
@@ -1060,6 +1056,102 @@ def train(conf: TrainConfig, gpus, nodes=1,
         plugins.append(DDPPlugin(find_unused_parameters=False))
 
 
+    model.setup() # loads training data from lmdb added by CW for errorchecking.
+
+
+    # Q:CW: What are the statistics for dynamic range of insightface attrib embeddings? (looks fine)
+    if False:
+        print('Gathering statistics on dynamic range of id vector embeddings')
+        import matplotlib.pyplot as plt
+
+        # Gather up stats (min, max, dynamic range) for insightface id vectors
+        embed_id_vec_min = []
+        embed_id_vec_max = []
+        embed_id_vec_dr = []
+        cond_id_vec_min = []
+        cond_id_vec_max = []
+        cond_id_vec_dr = []
+        num_batches = np.ceil(model.train_data.length/model.batch_size).astype(int)
+
+        for i,batch in enumerate(model.train_dataloader()):
+            print(f"Batch # {i}/{num_batches}")
+
+            embed = batch['embed']
+            im_batch = batch['img']
+            cond = model.encode(im_batch)
+
+            embed_id_vec_min.extend(embed.min(axis=1)[0].numpy())
+            embed_id_vec_max.extend(embed.max(axis=1)[0].numpy())
+            embed_id_vec_dr.extend(embed.max(axis=1)[0].numpy() -
+                                   embed.min(axis=1)[0].numpy())
+
+            cond_id_vec_min.extend(cond.min(axis=1)[0].numpy())
+            cond_id_vec_max.extend(cond.max(axis=1)[0].numpy())
+            cond_id_vec_dr.extend(cond.max(axis=1)[0].numpy() -
+                                   cond.min(axis=1)[0].numpy())
+
+        # plot histograms of id vector statistics
+        plt.figure( figsize=(12,4) )
+        plt.subplot(1,3,1)
+        plt.hist( np.array(embed_id_vec_min), 1000 )
+        plt.title('min')
+        #
+        plt.subplot(1,3,2)
+        plt.hist( np.array(embed_id_vec_max), 1000 )
+        plt.title('max')
+        #
+        plt.subplot(1,3,3)
+        plt.hist( np.array(embed_id_vec_dr), 1000 )
+        plt.title('dynamic range')
+        #
+        plt.suptitle('InsightFace ID Vectors')
+        plt.savefig('store/output/diffae/conditioning/insightface_idvec_dr.png')
+
+
+        # plot histograms of insightface id vectors
+        plt.figure( figsize=(12,4) )
+        plt.subplot(1,3,1)
+        plt.hist( np.array(cond_id_vec_min), 1000 )
+        plt.title('min')
+        #
+        plt.subplot(1,3,2)
+        plt.hist( np.array(cond_id_vec_max), 1000 )
+        plt.title('max')
+        #
+        plt.subplot(1,3,3)
+        plt.hist( np.array(cond_id_vec_dr), 1000 )
+        plt.title('dynamic range')
+        #
+        plt.suptitle('Diffae Zsem ID Vectors')
+        plt.savefig('store/output/diffae/conditioning/zsem_idvec_dr.png')
+
+    #import IPython; IPython.embed()
+
+
+    # Q:CW Do vectors in hdf5 file match corresponding vectors in model.train_data?
+    if False:
+        import h5py
+        from PIL import Image
+        f = h5py.File('store/datasets/celeba_addendum/attributes_insight.hdf5', 'r')
+        landmarks = {}
+        identity_embeddings = {}
+        image_list = []
+        landmarks_list = []
+        identity_embedding_list = []
+        for i,file_name in enumerate(f.keys()):
+            image_list.append(file_name)
+            landmarks[file_name] = np.array(f[file_name]['landmark_3d_68'])
+            identity_embeddings[file_name] = np.array(f[file_name]['embedding'])
+            landmarks_list.append(landmarks[file_name].reshape(1, -1))
+            identity_embedding_list.append(identity_embeddings[file_name].reshape(1, -1))
+            if i>10:
+                break
+        f.close()
+
+
+
+
+
     # # SETUP TO USE PL.TRAINER ON CPU FOR DEBUGGING.
     # trainer = pl.Trainer(fast_dev_run=True,
     #                      log_every_n_steps=1)
@@ -1084,8 +1176,9 @@ def train(conf: TrainConfig, gpus, nodes=1,
     )
 
     #print('After trainer & model.setup(), before trainer.fit')
-    #model.setup() # loads training data from lmdb added by CW for errorchecking.
-    #import IPython; IPython.embed()
+
+
+
 
 
 

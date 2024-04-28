@@ -28,6 +28,8 @@ data_paths = {
     os.path.expanduser('datasets/celeba.lmdb'),
     'celebaattriblmdb':
     os.path.expanduser('datasets/celeba_attrib.lmdb'),
+    'celebaembeddingslmdb':
+    os.path.expanduser('datasets/celeba_embeddings.lmdb'),
     'celebahq':
     os.path.expanduser('datasets/celebahq256.lmdb'),
     'horse256':
