@@ -313,6 +313,14 @@ class TrainConfig(BaseConfig):
                               original_resolution=None,
                               crop_d2c=True,
                               **kwargs)
+        elif self.data_name == 'celebaembeddingslmdb':
+            # always use d2c crop
+            #import IPython; IPython.embed()
+            return CelebA_attrib_lmdb(path=path or self.data_path,
+                              image_size=self.img_size,
+                              original_resolution=None,
+                              crop_d2c=True,
+                              **kwargs)
         else:
             raise NotImplementedError()
 
