@@ -18,7 +18,7 @@ import numpy as np
 
 import h5py
 
-h5_path = '/home/jack/ddpm/store/datasets/celeba_addendum/attributes_insight.hdf5'
+h5_path = 'store/datasets/celeba_addendum/attributes_insight.hdf5'
 
 
 def resize_and_convert(img, size, resample, quality=100):
@@ -60,9 +60,9 @@ class ConvertDataset(Dataset):
         return len(self.data)
 
     def __getitem__(self, index):
-        img, embedding = self.data[index]
+        img, embedding, landmark = self.data[index]
         bytes = resize_and_convert(img, self.size, Image.LANCZOS, quality=100)
-        return bytes, embedding
+        return bytes, embedding, landmark
 
 
 class ImageFolder(Dataset):
@@ -95,17 +95,22 @@ class ImageAttributeFolder(Dataset):
         path = self.folder + '/' + file_name
         img = Image.open(path)
         embedding = self.attr[file_name]['embedding']
-        return img, embedding
+        landmark = self.attr[file_name]['landmark_3d_68'] # CW
+
+        return img, embedding, landmark
 
 
 if __name__ == "__main__":
     from tqdm import tqdm
 
-    out_path = 'datasets/celeba.lmdb'
-    out_path = 'datasets/celeba_embeddings_v2.lmdb'
-    in_path = 'datasets/celeba/celeba/img_align_celeba'
+    #out_path = 'datasets/celeba.lmdb'
+    out_path = 'store/datasets/diffae/datasets/celeba_embeddings_landmarks.lmdb'
+    in_path = 'store/datasets/celeba/celeba/img_align_celeba'
     ext = 'jpg'
     size = None
+
+    check_bytes_match = False # print out embeddings and landmarks before converting
+                              # to bytes and after conversion as sanity check
 
     #dataset = ImageFolder(in_path, ext)
     dataset = ImageAttributeFolder(in_path, ext)
@@ -129,30 +134,45 @@ if __name__ == "__main__":
                     j = 0
                     for p in batch:
                         i = b*len(batch)+j
-                        img, embedding = p
+                        img, embedding, landmark = p
                         key = f"{size}-{str(i).zfill(7)}".encode("utf-8")
                         # print(key)
                         txn.put(key, img)
 
                         embedding = np.array(embedding)
-                        embedding_bytes = np.array(embedding).tobytes()
+                        embedding_bytes = embedding.tobytes()
                         key = f"{size}-{str(i).zfill(7)}-embedding".encode("utf-8")
-                        # print(key)
-                        print(key, embedding.sum(), embedding[:4])
+                        if check_bytes_match: print(key, embedding.sum(), embedding[:4])
                         txn.put(key, embedding_bytes)
+
+                        landmark = np.array(landmark).ravel() # shape from (68,3) to (204,)
+                        landmark_bytes = landmark.tobytes()
+                        key = f"{size}-{str(i).zfill(7)}-landmark".encode("utf-8")
+                        if check_bytes_match: print(key, landmark.sum(), landmark.shape, landmark[:4])
+                        txn.put(key, landmark_bytes)
+
                         j += 1
                         progress.update()
 
-                with env.begin(write=False) as txn:
-                    j = 0
-                    for p in batch:
-                        i = b*len(batch)+j
-                        key = f"{size}-{str(i).zfill(7)}-embedding".encode("utf-8")
-                        embedding_bytes = txn.get(key)
-                        embedding = np.frombuffer(embedding_bytes, dtype=np.float32)
-                        print(key, embedding.sum(), embedding[:4])
-                        j += 1
-                import IPython ; IPython.embed()
+                # Reading it back in from bytes to check that it matches expectations.
+                if check_bytes_match:
+                    with env.begin(write=False) as txn:
+                        j = 0
+                        for p in batch:
+                            i = b*len(batch)+j
+                            #
+                            key = f"{size}-{str(i).zfill(7)}-embedding".encode("utf-8")
+                            embedding_bytes = txn.get(key)
+                            embedding = np.frombuffer(embedding_bytes, dtype=np.float32)
+                            print(key, embedding.sum(), embedding[:4])
+                            #
+                            key = f"{size}-{str(i).zfill(7)}-landmark".encode("utf-8")
+                            landmark_bytes = txn.get(key)
+                            landmark = np.frombuffer(landmark_bytes, dtype=np.float32)
+                            print(key, landmark.sum(), landmark[:4])
+                            #
+                            j += 1
+                    import IPython ; IPython.embed()
                 b += 1
 
         with env.begin(write=True) as txn:
