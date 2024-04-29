@@ -1089,6 +1089,9 @@ def train(conf: TrainConfig, gpus, nodes=1,
             cond_id_vec_dr.extend(cond.max(axis=1)[0].numpy() -
                                    cond.min(axis=1)[0].numpy())
 
+            # if i>10:
+            #     break
+
         # plot histograms of id vector statistics
         plt.figure( figsize=(12,4) )
         plt.subplot(1,3,1)
@@ -1104,7 +1107,7 @@ def train(conf: TrainConfig, gpus, nodes=1,
         plt.title('dynamic range')
         #
         plt.suptitle('InsightFace ID Vectors')
-        plt.savefig('store/output/diffae/conditioning/insightface_idvec_dr.png')
+        plt.savefig('store/output/diffae/conditioning/insightface_idvec_dr_jack.png')
 
 
         # plot histograms of insightface id vectors

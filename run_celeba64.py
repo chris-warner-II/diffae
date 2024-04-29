@@ -12,7 +12,7 @@ if __name__ == '__main__':
     #
     conf.batch_size = 32
     conf.data_name = 'celebaembeddingslmdb'
-    conf.name = 'celeba64d2c_autoenc_embeddings'
+    conf.name = 'celeba64d2c_autoenc_embeddings_zsem'
     #conf.fid_cache = conf.fid_cache + 'b' # to keep two jobs from crashing into eachother.
     #       not working. Add it directly into eval_fid function in metrics.py
     #
