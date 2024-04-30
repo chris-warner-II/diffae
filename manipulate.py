@@ -35,7 +35,7 @@ def main():
 
 
     # # (2). Setup and load in models
-    conf = ffhq256_autoenc()
+    conf = celeba64d2c_autoenc() #ffhq256_autoenc()
     # print(conf.name)
     model = LitModel(conf)
     state = torch.load(f'{dir_pre}checkpoints/{conf.name}/last.ckpt', map_location='cpu')
@@ -44,7 +44,6 @@ def main():
     model.ema_model.to(device);
 
     # #  (2b). Conditioning model
-
     cls_conf = ffhq256_autoenc_cls()
     cls_conf.pretrain.path = dir_pre + cls_conf.pretrain.path           # update path to model weights
     cls_conf.latent_infer_path = dir_pre + cls_conf.latent_infer_path   # update path to model weights
