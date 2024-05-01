@@ -25,7 +25,7 @@ def main():
 
     # # (1). Directory and device
     dir_pre = 'store/models/diffae/'
-    dir_figs = 'store/output/diffae/faceswap/nix_tgt_embed_0p1xT'
+    dir_figs = 'store/output/diffae/faceswap/embed_only_model'
     os.makedirs(dir_figs, exist_ok=True)
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -38,7 +38,7 @@ def main():
 
     # # (2). Setup and load in models
     conf = celeba64d2c_autoenc()
-    conf.name = 'celeba64d2c_autoenc_embeddings_zsem_resume'
+    conf.name = 'celeba64d2c_autoenc_embeddings'
     conf.data_name = 'celebaembeddingstrainlmdb'
 
     # print(conf.name)
@@ -64,23 +64,20 @@ def main():
         source_fname = data[s]['fname']
 
         # # (4). Encode
-        cond = model.encode(target_image) + source_embedding
+        cond = source_embedding # + model.encode(target_image)
         xT = model.encode_stochastic(target_image, cond, T=args.Te)
 
         # # (5). Conditioning on another identity in test set - FaceSwap
         cond2 = cond #- target_embedding + source_embedding
         swap_img = model.render(xT, cond2, T=args.Tr)
 
-        cond_src = model.encode(source_image) + source_embedding
-        cond_tgt = model.encode(target_image) + target_embedding
+        cond_src = source_embedding #+ model.encode(source_image)
         xT_src = model.encode_stochastic(source_image, cond_src, T=args.Te)
-        xT_tgt = model.encode_stochastic(target_image, cond_src, T=args.Te)
-
         gen_src_img = model.render(xT_src, cond_src, T=args.Tr)
-        gen_tgt_img = model.render(xT_tgt, cond_tgt, T=args.Tr)
 
-        # gen_src_img_0p1 = model.render(0.1*xT_src, cond_src, T=args.Tr)
-        # gen_tgt_img_0p1 = model.render(0.1*xT, cond, T=args.Tr)
+        cond_tgt = target_embedding #+ model.encode(target_image)
+        xT_tgt = model.encode_stochastic(target_image, cond_tgt, T=args.Te)
+        gen_tgt_img = model.render(xT_tgt, cond_tgt, T=args.Tr)
 
         src_img = (source_image + 1) / 2
         tgt_img = (target_image + 1) / 2
@@ -107,13 +104,13 @@ def main():
         #
         plt.subplot(2, 3, 4)
         plt.imshow(gen_src_img[0].permute(1, 2, 0).cpu())
-        plt.title(f"Gen Source: {source_fname}")
+        plt.title(f"Gen Source")
         plt.xticks([])
         plt.yticks([])
         #
         plt.subplot(2, 3, 6)
         plt.imshow(gen_tgt_img[0].permute(1, 2, 0).cpu())
-        plt.title(f"Gen Target: {target_fname}")
+        plt.title(f"Gen Target")
         plt.xticks([])
         plt.yticks([])
         #
