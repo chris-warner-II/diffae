@@ -56,17 +56,17 @@ def main():
     for _ in tqdm(range(100)):
         t,s = random.sample(range(len(data)), 2) # randomly sample source & target
 
-        target_image = data[t]['img'][None]
-        target_embedding = data[t]['embed']
+        target_image = data[t]['img'][None].to(device)
+        target_embedding = data[t]['embed'].to(device)
         target_fname = data[t]['fname']
         #
-        source_image = data[s]['img'][None]
-        source_embedding = data[s]['embed']
+        source_image = data[s]['img'][None].to(device)
+        source_embedding = data[s]['embed'].to(device)
         source_fname = data[s]['fname']
 
         # # (4). Encode
-        cond = model.encode(target_image.to(device)) + target_embedding
-        xT = model.encode_stochastic(target_image.to(device), cond, T=args.Te)
+        cond = model.encode(target_image) + target_embedding
+        xT = model.encode_stochastic(target_image, cond, T=args.Te)
 
         # # (5). Conditioning on another identity in test set - FaceSwap
         cond2 = cond - target_embedding + source_embedding
