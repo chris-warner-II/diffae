@@ -33,7 +33,7 @@ def main():
     print(f'Using device: {device}')
 
     if device=='cuda':
-        os.system('nvidia_smi')
+        os.system('nvidia-smi')
 
 
     # # (2). Setup and load in models
@@ -64,64 +64,55 @@ def main():
         source_fname = data[s]['fname']
 
         # # (4). Encode
-        cond = model.encode(target_image) + target_embedding
+        cond = model.encode(target_image) + source_embedding
         xT = model.encode_stochastic(target_image, cond, T=args.Te)
 
         # # (5). Conditioning on another identity in test set - FaceSwap
-        cond2 = cond - target_embedding #+ source_embedding
+        cond2 = cond #- target_embedding + source_embedding
         swap_img = model.render(xT, cond2, T=args.Tr)
 
         cond_src = model.encode(source_image) + source_embedding
+        cond_tgt = model.encode(target_image) + target_embedding
         xT_src = model.encode_stochastic(source_image, cond_src, T=args.Te)
-        gen_src_img = model.render(xT_src, cond_src, T=args.Tr)
-        gen_tgt_img = model.render(xT, cond, T=args.Tr)
+        xT_tgt = model.encode_stochastic(target_image, cond_src, T=args.Te)
 
-        gen_src_img_0p1 = model.render(0.1*xT_src, cond_src, T=args.Tr)
-        gen_tgt_img_0p1 = model.render(0.1*xT, cond, T=args.Tr)
+        gen_src_img = model.render(xT_src, cond_src, T=args.Tr)
+        gen_tgt_img = model.render(xT_tgt, cond_tgt, T=args.Tr)
+
+        # gen_src_img_0p1 = model.render(0.1*xT_src, cond_src, T=args.Tr)
+        # gen_tgt_img_0p1 = model.render(0.1*xT, cond, T=args.Tr)
 
         src_img = (source_image + 1) / 2
         tgt_img = (target_image + 1) / 2
 
         # # (6). Plot and save figures
         plt.figure( figsize=(10,5) )
-        plt.subplot(3,3,1)
+        plt.subplot(2,3,1)
         plt.imshow(src_img[0].permute(1, 2, 0).cpu())
         plt.title(f"Source: {source_fname}")
         plt.xticks([])
         plt.yticks([])
         #
-        plt.subplot(3, 3, 2)
+        plt.subplot(2, 3, 2)
         plt.imshow(swap_img[0].permute(1, 2, 0).cpu())
         plt.title(f"Swap")
         plt.xticks([])
         plt.yticks([])
         #
-        plt.subplot(3, 3, 3)
+        plt.subplot(2, 3, 3)
         plt.imshow(tgt_img[0].permute(1, 2, 0).cpu())
         plt.title(f"Target: {target_fname}")
         plt.xticks([])
         plt.yticks([])
         #
-        plt.subplot(3, 3, 4)
+        plt.subplot(2, 3, 4)
         plt.imshow(gen_src_img[0].permute(1, 2, 0).cpu())
         plt.title(f"Gen Source: {source_fname}")
         plt.xticks([])
         plt.yticks([])
         #
-        plt.subplot(3, 3, 6)
+        plt.subplot(2, 3, 6)
         plt.imshow(gen_tgt_img[0].permute(1, 2, 0).cpu())
-        plt.title(f"Gen Target: {target_fname}")
-        plt.xticks([])
-        plt.yticks([])
-        #
-        plt.subplot(3, 3, 7)
-        plt.imshow(gen_src_img_0p1[0].permute(1, 2, 0).cpu())
-        plt.title(f"Gen Source: {source_fname}")
-        plt.xticks([])
-        plt.yticks([])
-        #
-        plt.subplot(3, 3, 9)
-        plt.imshow(gen_tgt_img_0p1[0].permute(1, 2, 0).cpu())
         plt.title(f"Gen Target: {target_fname}")
         plt.xticks([])
         plt.yticks([])
