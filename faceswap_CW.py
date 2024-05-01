@@ -56,11 +56,11 @@ def main():
         t,s = random.sample(range(len(data)), 2) # randomly sample source & target
 
         target_image = data[t]['img'][None].to(device)
-        target_embedding = data[t]['embed'].to(device)
+        target_embedding = data[t]['embed'].unsqueeze(0).to(device)
         target_fname = data[t]['fname']
         #
         source_image = data[s]['img'][None].to(device)
-        source_embedding = data[s]['embed'].to(device)
+        source_embedding = data[s]['embed'].unsqueeze(0).to(device)
         source_fname = data[s]['fname']
 
         # # (4). Encode

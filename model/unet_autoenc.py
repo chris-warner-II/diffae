@@ -155,12 +155,10 @@ class BeatGANsAutoencModel(BeatGANsUNetModel):
             # BUG FIX from repo issue (CW)
             #tmp = self.encode(x_start)
             #cond = tmp['cond']
-            cond = self.encode(x_start) + 0.1*kwargs['embed']
+            cond = kwargs['embed'] # self.encode(x_start) + kwargs['embed']
 
             #print('Inside unet_autoenc.BeatGANsAutoencModel.forward')
             #import IPython; IPython.embed()
-
-            #cond = kwargs['embed']*0.001
 
         if t is not None:
             _t_emb = timestep_embedding(t, self.conf.model_channels)
