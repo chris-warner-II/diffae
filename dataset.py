@@ -146,18 +146,8 @@ class BaseLMDB_array(Dataset):
             key_embed = f'{self.original_resolution}-{str(index).zfill(self.zfill)}-embedding'.encode('utf-8')
 
             embed_bytes = txn.get(key_embed)
-
-            if embed_bytes is None:
-                print('No embedding. Return index only.')
-                return None, None, index
-
             embed = np.frombuffer(embed_bytes, dtype=np.float32)
             # Hardcoding float32 for now. May want to pass that in at some point.
-            #embed_c = embed.copy()
-            #embed_c.setflags(write=True)
-
-            #print(embed.shape, embed[:10])
-
 
             #print('In dataset get item')
             #import IPython; IPython.embed()
@@ -165,7 +155,7 @@ class BaseLMDB_array(Dataset):
             img_bytes = txn.get(key)
             buffer = BytesIO(img_bytes)
             img = Image.open(buffer)
-            return img, torch.tensor(embed), index
+            return img, torch.tensor(embed)
 
 
 
@@ -389,7 +379,7 @@ class CelebA_attrib_lmdb(Dataset):
         if self.transform is not None:
             img = self.transform(img)
 
-        return {'img': img, 'embed': embed,'index': index}
+        return {'img': img, 'embed': embed, 'index': index}
 
 
 class Horse_lmdb(Dataset):
