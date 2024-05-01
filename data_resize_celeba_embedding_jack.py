@@ -104,7 +104,7 @@ if __name__ == "__main__":
     from tqdm import tqdm
 
     #out_path = 'datasets/celeba.lmdb'
-    out_path = 'store/datasets/diffae/datasets/celeba_embeddings_test.lmdb'
+    out_path = 'store/datasets/diffae/datasets/celeba_embeddings_v2.lmdb'
     in_path = 'store/datasets/celeba/celeba/img_align_celeba'
     ext = 'jpg'
     size = None

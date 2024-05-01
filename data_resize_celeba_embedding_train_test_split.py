@@ -136,9 +136,6 @@ if __name__ == "__main__":
     for id in id_test_list:
         file_test_list.extend( id_2_file[id] )
 
-
-
-
     check_bytes_match = False # print out embeddings and landmarks before converting
                               # to bytes and after conversion as sanity check
 
@@ -153,85 +150,82 @@ if __name__ == "__main__":
                         shuffle=False)
 
 
-
-
-
     #import IPython; IPython.embed()
 
-    # # Make the train.lmdb
-    # target_train = os.path.expanduser(out_path_train)
-    # if os.path.exists(target_train):
-    #     shutil.rmtree(target_train)
-    #
-    # print('making train.lmdb')
-    # with lmdb.open(target_train, map_size=1024**4, readahead=False) as env:
-    #     with tqdm(total=len(dataset)) as progress:
-    #         b = 0
-    #         i1 = 0 # counter to build lmdb dataset
-    #         i2 = 0 # counter to check that bytes match
-    #         for batch in loader:
-    #             with env.begin(write=True) as txn:
-    #                 j = 0
-    #                 for p in batch:
-    #                     i = b*len(batch)+j
-    #                     img, embedding, landmark, fname = p
-    #                     if fname not in file_test_list:
-    #                         key = f"{size}-{str(i1).zfill(7)}".encode("utf-8")
-    #                         # print(key)
-    #                         txn.put(key, img)
-    #
-    #                         key = f"{size}-{str(i1).zfill(7)}-fname".encode("utf-8")
-    #                         txn.put(key, fname.encode("utf-8"))
-    #                         if check_bytes_match: print(key, fname)
-    #
-    #                         embedding = np.array(embedding)
-    #                         embedding_bytes = embedding.tobytes()
-    #                         key = f"{size}-{str(i1).zfill(7)}-embedding".encode("utf-8")
-    #                         if check_bytes_match: print(key, embedding.sum(), embedding[:4])
-    #                         txn.put(key, embedding_bytes)
-    #
-    #                         landmark = np.array(landmark).ravel() # shape from (68,3) to (204,)
-    #                         landmark_bytes = landmark.tobytes()
-    #                         key = f"{size}-{str(i1).zfill(7)}-landmark".encode("utf-8")
-    #                         if check_bytes_match: print(key, landmark.sum(), landmark.shape, landmark[:4])
-    #                         txn.put(key, landmark_bytes)
-    #                         i1 += 1
-    #
-    #                     j += 1
-    #                     progress.update()
-    #
-    #             # Reading it back in from bytes to check that it matches expectations.
-    #             if check_bytes_match:
-    #                 with env.begin(write=False) as txn:
-    #                     j = 0
-    #                     for p in batch:
-    #                         i = b*len(batch)+j
-    #                         img, embedding, landmark, fname = p
-    #                         if fname not in file_test_list:
-    #                             #
-    #                             key = f"{size}-{str(i2).zfill(7)}-fname".encode("utf-8")
-    #                             fname_b = txn.get(key)
-    #                             print(key, fname_b)
-    #                             #
-    #                             key = f"{size}-{str(i2).zfill(7)}-embedding".encode("utf-8")
-    #                             embedding_bytes = txn.get(key)
-    #                             embedding = np.frombuffer(embedding_bytes, dtype=np.float32)
-    #                             print(key, embedding.sum(), embedding[:4])
-    #                             #
-    #                             key = f"{size}-{str(i2).zfill(7)}-landmark".encode("utf-8")
-    #                             landmark_bytes = txn.get(key)
-    #                             landmark = np.frombuffer(landmark_bytes, dtype=np.float32)
-    #                             print(key, landmark.sum(), landmark[:4])
-    #                             i2 += 1
-    #                             #
-    #                         j += 1
-    #
-    #                 assert i1 == i2
-    #                 import IPython ; IPython.embed()
-    #             b += 1
-    #
-    #     with env.begin(write=True) as txn:
-    #         txn.put("length".encode("utf-8"), str(i1).encode("utf-8"))
+    # Make the train.lmdb
+    target_train = os.path.expanduser(out_path_train)
+    if os.path.exists(target_train):
+        shutil.rmtree(target_train)
+
+    print('making train.lmdb')
+    with lmdb.open(target_train, map_size=1024**4, readahead=False) as env:
+        with tqdm(total=len(dataset)) as progress:
+            b = 0
+            i1 = 0 # counter to build lmdb dataset
+            i2 = 0 # counter to check that bytes match
+            for batch in loader:
+                with env.begin(write=True) as txn:
+                    j = 0
+                    for p in batch:
+                        i = b*len(batch)+j
+                        img, embedding, landmark, fname = p
+                        if fname not in file_test_list:
+                            key = f"{size}-{str(i1).zfill(7)}".encode("utf-8")
+                            # print(key)
+                            txn.put(key, img)
+
+                            key = f"{size}-{str(i1).zfill(7)}-fname".encode("utf-8")
+                            txn.put(key, fname.encode("utf-8"))
+                            if check_bytes_match: print(key, fname)
+
+                            embedding = np.array(embedding)
+                            embedding_bytes = embedding.tobytes()
+                            key = f"{size}-{str(i1).zfill(7)}-embedding".encode("utf-8")
+                            if check_bytes_match: print(key, embedding.sum(), embedding[:4])
+                            txn.put(key, embedding_bytes)
+
+                            landmark = np.array(landmark).ravel() # shape from (68,3) to (204,)
+                            landmark_bytes = landmark.tobytes()
+                            key = f"{size}-{str(i1).zfill(7)}-landmark".encode("utf-8")
+                            if check_bytes_match: print(key, landmark.sum(), landmark.shape, landmark[:4])
+                            txn.put(key, landmark_bytes)
+                            i1 += 1
+
+                        j += 1
+                        progress.update()
+
+                # Reading it back in from bytes to check that it matches expectations.
+                if check_bytes_match:
+                    with env.begin(write=False) as txn:
+                        j = 0
+                        for p in batch:
+                            i = b*len(batch)+j
+                            img, embedding, landmark, fname = p
+                            if fname not in file_test_list:
+                                #
+                                key = f"{size}-{str(i2).zfill(7)}-fname".encode("utf-8")
+                                fname_b = txn.get(key)
+                                print(key, fname_b)
+                                #
+                                key = f"{size}-{str(i2).zfill(7)}-embedding".encode("utf-8")
+                                embedding_bytes = txn.get(key)
+                                embedding = np.frombuffer(embedding_bytes, dtype=np.float32)
+                                print(key, embedding.sum(), embedding[:4])
+                                #
+                                key = f"{size}-{str(i2).zfill(7)}-landmark".encode("utf-8")
+                                landmark_bytes = txn.get(key)
+                                landmark = np.frombuffer(landmark_bytes, dtype=np.float32)
+                                print(key, landmark.sum(), landmark[:4])
+                                i2 += 1
+                                #
+                            j += 1
+
+                    assert i1 == i2
+                    import IPython ; IPython.embed()
+                b += 1
+
+        with env.begin(write=True) as txn:
+            txn.put("length".encode("utf-8"), str(i1).encode("utf-8"))
 
 
     # Make the test.lmdb
