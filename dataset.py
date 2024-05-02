@@ -144,12 +144,12 @@ class BaseLMDB_array(Dataset):
             #print(index)
             key = f'{self.original_resolution}-{str(index).zfill(self.zfill)}'.encode('utf-8')
             key_embed = f'{self.original_resolution}-{str(index).zfill(self.zfill)}-embedding'.encode('utf-8')
-            key_fname = f'{self.original_resolution}-{str(index).zfill(self.zfill)}-fname'.encode('utf-8')
+            #key_fname = f'{self.original_resolution}-{str(index).zfill(self.zfill)}-fname'.encode('utf-8')
 
             embed_bytes = txn.get(key_embed)
             embed = np.frombuffer(embed_bytes, dtype=np.float32)
 
-            fname = txn.get(key_fname).decode('utf-8')
+            #fname = txn.get(key_fname).decode('utf-8')
 
             #print('In BaseLMDB_array dataset getitem')
             #import IPython; IPython.embed()
@@ -157,7 +157,7 @@ class BaseLMDB_array(Dataset):
             img_bytes = txn.get(key)
             buffer = BytesIO(img_bytes)
             img = Image.open(buffer)
-            return img, torch.tensor(embed), fname
+            return img, torch.tensor(embed) #, fname
 
 
 
@@ -375,15 +375,17 @@ class CelebA_attrib_lmdb(Dataset):
         img = self.data[index][0]
         embed = self.data[index][1]
         embed /= (embed**2).sum().sqrt()
-        fname = self.data[index][2]
+        #fname = self.data[index][2]
 
         if img is None:
-            return {'img': img, 'embed': embed, 'fname': fname, 'index': index}
+            #return {'img': img, 'embed': embed, 'fname': fname, 'index': index}
+            return {'img': img, 'embed': embed, 'index': index}
 
         if self.transform is not None:
             img = self.transform(img)
 
-        return {'img': img, 'embed': embed, 'fname': fname, 'index': index}
+        #return {'img': img, 'embed': embed, 'fname': fname, 'index': index}
+        return {'img': img, 'embed': embed, 'index': index}
 
 
 class Horse_lmdb(Dataset):

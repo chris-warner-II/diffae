@@ -189,7 +189,7 @@ def evaluate_fid(
                                         parallel=False)
 
         # put the val images to a directory
-        cache_dir = f'{conf.fid_cache}_{conf.eval_num_images}' # added b to avoid crash by 2 jobs. Remove!
+        cache_dir = f'{conf.fid_cache}_{conf.eval_num_images}b' # added b to avoid crash by 2 jobs. Remove!
         if (os.path.exists(cache_dir)
                 and len(os.listdir(cache_dir)) < conf.eval_num_images):
             shutil.rmtree(cache_dir)
