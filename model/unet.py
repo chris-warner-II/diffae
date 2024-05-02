@@ -404,6 +404,10 @@ class BeatGANsEncoderModel(nn.Module):
         input_block_chans = [ch]
         ds = 1
         resolution = conf.image_size
+
+        #print('inside unet.py BeatGANsEncoderModel init')
+        #import IPython; IPython.embed()
+
         for level, mult in enumerate(conf.channel_mult):
             for _ in range(conf.num_res_blocks):
                 layers = [

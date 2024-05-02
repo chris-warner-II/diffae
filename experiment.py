@@ -1151,8 +1151,8 @@ def train(conf: TrainConfig, gpus, nodes=1,
                 break
         f.close()
 
-
-
+    #print('in experiment.py train()')
+    #import IPython; IPython.embed()
 
 
     # # SETUP TO USE PL.TRAINER ON CPU FOR DEBUGGING.

@@ -146,6 +146,9 @@ class MLPLNAct(nn.Module):
         else:
             self.norm = nn.Identity()
 
+        print('insider latentnet.py in MLPLNAct')
+        import IPython; IPython.embed()
+
         if dropout > 0:
             self.dropout = nn.Dropout(p=dropout)
         else:

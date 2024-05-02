@@ -374,6 +374,7 @@ class CelebA_attrib_lmdb(Dataset):
 
         img = self.data[index][0]
         embed = self.data[index][1]
+        embed /= (embed**2).sum().sqrt()
         fname = self.data[index][2]
 
         if img is None:

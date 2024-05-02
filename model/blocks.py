@@ -96,6 +96,9 @@ class ResBlock(TimestepBlock):
         super().__init__()
         self.conf = conf
 
+        #print('in blocks.py ResBlock init')
+        #import IPython; IPython.embed()
+
         #############################
         # IN LAYERS
         #############################
@@ -103,7 +106,9 @@ class ResBlock(TimestepBlock):
         layers = [
             normalization(conf.channels),
             nn.SiLU(),
+            #nn.Dropout(p=conf.dropout), # added by CW - orig had no dropout here
             conv_nd(conf.dims, conf.channels, conf.out_channels, 3, padding=1)
+
         ]
         self.in_layers = nn.Sequential(*layers)
 
@@ -143,7 +148,7 @@ class ResBlock(TimestepBlock):
                            3,
                            padding=1)
             if conf.use_zero_module:
-                # zere out the weights
+                # zero out the weights
                 # it seems to help training
                 conv = zero_module(conv)
 

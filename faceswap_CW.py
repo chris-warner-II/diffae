@@ -25,7 +25,7 @@ def main():
 
     # # (1). Directory and device
     dir_pre = 'store/models/diffae/'
-    dir_figs = 'store/output/diffae/faceswap/embed_only_model'
+    dir_figs = 'store/output/diffae/faceswap/embed_only_model_halfhalf'
     os.makedirs(dir_figs, exist_ok=True)
 
     device = 'cuda' if torch.cuda.is_available() else 'cpu'
@@ -64,11 +64,11 @@ def main():
         source_fname = data[s]['fname']
 
         # # (4). Encode
-        cond = source_embedding # + model.encode(target_image)
+        cond = target_embedding # + model.encode(target_image)
         xT = model.encode_stochastic(target_image, cond, T=args.Te)
 
         # # (5). Conditioning on another identity in test set - FaceSwap
-        cond2 = cond #- target_embedding + source_embedding
+        cond2 = 0.5*source_embedding + 0.5*target_embedding #cond #- target_embedding + source_embedding
         swap_img = model.render(xT, cond2, T=args.Tr)
 
         cond_src = source_embedding #+ model.encode(source_image)
