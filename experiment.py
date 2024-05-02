@@ -1188,7 +1188,7 @@ def train(conf: TrainConfig, gpus, nodes=1,
     if mode == 'train':
         trainer.fit(model)
 
-        print('After trainer.fit')
+        #print('After trainer.fit')
         #import IPython; IPython.embed()
 
     elif mode == 'eval':
