@@ -94,8 +94,8 @@ def celeba64d2c_ddpm():
 def celeba64d2c_autoenc():
     conf = ffhq64_autoenc()
     conf.data_name = 'celebalmdb'
-    conf.eval_every_samples = 10_000_000
-    conf.eval_ema_every_samples = 10_000_000
+    conf.eval_every_samples = 1_000_000 # 10_000_000 (CW)
+    conf.eval_ema_every_samples = 1_000_000 # 10_000_000 (CW)
     conf.total_samples = 72_000_000
     conf.name = 'celeba64d2c_autoenc'
     return conf
@@ -194,8 +194,8 @@ def ffhq128_ddpm_130M():
 def ffhq128_autoenc_130M():
     conf = ffhq128_autoenc_base()
     conf.total_samples = 130_000_000
-    conf.eval_ema_every_samples = 10_000_000
-    conf.eval_every_samples = 10_000_000
+    conf.eval_ema_every_samples = 1_000_000 # 10_000_000 (CW)
+    conf.eval_every_samples = 1_000_000 # 10_000_000 (CW)
     conf.name = 'ffhq128_autoenc_130M'
     return conf
 
@@ -247,7 +247,7 @@ def pretrain_celeba64d2c_72M():
         path=f'checkpoints/{celeba64d2c_autoenc().name}/last.ckpt',
     )
     conf.latent_infer_path = f'checkpoints/{celeba64d2c_autoenc().name}/latent.pkl'
-    return conf
+    return confceleba64d2c_autoenc
 
 
 def pretrain_ffhq128_autoenc72M():

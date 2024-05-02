@@ -79,6 +79,18 @@ def adamw_weight_decay(conf: TrainConfig):
     conf.weight_decay = 0.01
     return conf
 
+def ffhq64_autoenc_latent():
+    # copied from ffhq128_autoenc_latent(), edit to fit 64.
+    conf = pretrain_ffhq128_autoenc130M()
+    conf = latent_diffusion128_config(conf)
+    conf = latent_mlp_2048_norm_10layers(conf)
+    conf = latent_256_batch_size(conf)
+    conf = adamw_weight_decay(conf)
+    conf.total_samples = 101_000_000
+    conf.latent_loss_type = LossType.l1
+    conf.latent_beta_scheduler = 'const0.008'
+    conf.name = 'ffhq128_autoenc_latent'
+    return conf
 
 def ffhq128_autoenc_latent():
     conf = pretrain_ffhq128_autoenc130M()

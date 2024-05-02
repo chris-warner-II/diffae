@@ -189,7 +189,7 @@ def evaluate_fid(
                                         parallel=False)
 
         # put the val images to a directory
-        cache_dir = f'{conf.fid_cache}_{conf.eval_num_images}'
+        cache_dir = f'{conf.fid_cache}_{conf.eval_num_images}' # added b to avoid crash by 2 jobs. Remove!
         if (os.path.exists(cache_dir)
                 and len(os.listdir(cache_dir)) < conf.eval_num_images):
             shutil.rmtree(cache_dir)
@@ -291,8 +291,8 @@ def evaluate_fid(
                         x_T=x_T,
                         x_start=imgs,
                         cond=None,
-                        sampler=sampler,
-                        latent_sampler=latent_sampler).cpu()
+                        sampler=sampler).cpu()
+                        #latent_sampler=latent_sampler).cpu()
                     # model: BeatGANsAutoencModel
                     # # returns {'cond', 'cond2'}
                     # conds = model.encode(imgs)

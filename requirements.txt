@@ -1,3 +1,6 @@
+# Need to run this with python<3.10. Newest python I can use is python 3.9.19
+# conda activate basic_py3.9 - This was made by 'conda install python=3.9.19 pip'
+
 pytorch-lightning==1.4.5
 torchmetrics==0.5.0
 torch==1.8.1
@@ -11,3 +14,11 @@ lpips==0.1.4
 lmdb==1.2.1
 ftfy
 regex
+
+protobuf==4.25.3
+pillow==9.5.0
+jupyter
+matplotlib
+tensorboard
+torchinfo
+h5py

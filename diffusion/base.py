@@ -120,7 +120,11 @@ class GaussianDiffusionBeatGans:
         if noise is None:
             noise = th.randn_like(x_start)
 
-        x_t = self.q_sample(x_start, t, noise=noise)
+        #print('Inside base.GaussianDiffusionBeatGans.training_losses')
+
+
+        #print('entering q_sample in GaussianDiffusionBeatGans.training_losses')
+        x_t = self.q_sample(x_start, t, noise=noise) # noised image
 
         terms = {'x_t': x_t}
 
@@ -130,10 +134,16 @@ class GaussianDiffusionBeatGans:
         ]:
             with autocast(self.conf.fp16):
                 # x_t is static wrt. to the diffusion process
+                #print('entering model.forward in GaussianDiffusionBeatGans.training_losses')
+                #print('where model is diffusion.diffusion._WrappedModel')
                 model_forward = model.forward(x=x_t.detach(),
                                               t=self._scale_timesteps(t),
                                               x_start=x_start.detach(),
                                               **model_kwargs)
+                #print('after model.forward')
+
+
+
             model_output = model_forward.pred
 
             _model_output = model_output
@@ -191,11 +201,21 @@ class GaussianDiffusionBeatGans:
         Args:
             x_start: given for the autoencoder
         """
-        if model_kwargs is None:
-            model_kwargs = {}
+        #print('In GaussianDiffusionBeatGans.sample in base.py')
+
+
+        if model_kwargs is None or list(model_kwargs.keys())==['embed']:
+            #print('Adding xstart and cond to model_kwargs')
+            #print(f'Model_kwargs: {model_kwargs.keys()}')
+            if model_kwargs is None:
+                #print('model_kwargs is none')
+                model_kwargs = {}
+            #
             if self.conf.model_type.has_autoenc():
                 model_kwargs['x_start'] = x_start
                 model_kwargs['cond'] = cond
+
+        #import IPython; IPython.embed()
 
         if self.conf.gen_type == GenerativeType.ddpm:
             return self.p_sample_loop(model,
@@ -205,6 +225,7 @@ class GaussianDiffusionBeatGans:
                                       model_kwargs=model_kwargs,
                                       progress=progress)
         elif self.conf.gen_type == GenerativeType.ddim:
+            #print('Entering GaussianDiffusionBeatGans.ddim_sample_loop in base.py')
             return self.ddim_sample_loop(model,
                                          shape=shape,
                                          noise=noise,
@@ -298,6 +319,8 @@ class GaussianDiffusionBeatGans:
                  - 'log_variance': the log of 'variance'.
                  - 'pred_xstart': the prediction for x_0.
         """
+        #print('Inside GaussianDiffusionBeatGans.p_mean_variance in base.py')
+
         if model_kwargs is None:
             model_kwargs = {}
 
@@ -550,6 +573,7 @@ class GaussianDiffusionBeatGans:
         Returns a generator over dicts, where each dict is the return value of
         p_sample().
         """
+
         if device is None:
             device = next(model.parameters()).device
         if noise is not None:
@@ -597,6 +621,7 @@ class GaussianDiffusionBeatGans:
 
         Same usage as p_sample().
         """
+        #print('Inside GaussianDiffusionBeatGans.ddim_sample in base.py' )
         out = self.p_mean_variance(
             model,
             x,
@@ -731,6 +756,9 @@ class GaussianDiffusionBeatGans:
 
         Same usage as p_sample_loop().
         """
+        #print('Inside GaussianDiffusionBeatGans.ddim_sample_loop in base.py')
+        #print(f'model_kwargs: {model_kwargs.keys()}')
+
         final = None
         for sample in self.ddim_sample_loop_progressive(
                 model,
@@ -766,6 +794,10 @@ class GaussianDiffusionBeatGans:
 
         Same usage as p_sample_loop_progressive().
         """
+        #print('Inside GaussianDiffusionBeatGans.ddim_sample_loop_progressive in base.py')
+        #print(f'model_kwargs: {model_kwargs.keys()}')
+        #import IPython; IPython.embed()
+
         if device is None:
             device = next(model.parameters()).device
         if noise is not None:

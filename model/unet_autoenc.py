@@ -84,7 +84,11 @@ class BeatGANsAutoencModel(BeatGANsUNetModel):
 
     def encode(self, x):
         cond = self.encoder.forward(x)
-        return {'cond': cond}
+        # import Python; IPython.embed() # - Q: What is does cond look like?
+        # Jack thinks this is where we can append identity representation from
+        # Insightface to condition on it. Concatenate it into cond...
+        return cond
+        # return{'cond': cond} # BUG FIX from repo issue
 
     @property
     def stylespace_sizes(self):
@@ -148,8 +152,15 @@ class BeatGANsAutoencModel(BeatGANsUNetModel):
             if x is not None:
                 assert len(x) == len(x_start), f'{len(x)} != {len(x_start)}'
 
-            tmp = self.encode(x_start)
-            cond = tmp['cond']
+            # BUG FIX from repo issue (CW)
+            #tmp = self.encode(x_start)
+            #cond = tmp['cond']
+            cond = self.encode(x_start) + 0.1*kwargs['embed']
+
+            #print('Inside unet_autoenc.BeatGANsAutoencModel.forward')
+            #import IPython; IPython.embed()
+
+            #cond = kwargs['embed']*0.001
 
         if t is not None:
             _t_emb = timestep_embedding(t, self.conf.model_channels)

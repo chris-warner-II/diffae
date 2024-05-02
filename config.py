@@ -26,6 +26,14 @@ data_paths = {
     # used for training DPM models
     'celebalmdb':
     os.path.expanduser('datasets/celeba.lmdb'),
+    'celebaattriblmdb':
+    os.path.expanduser('datasets/celeba_attrib.lmdb'),
+    'celebaembeddingslmdb':
+    os.path.expanduser('datasets/celeba_embeddings.lmdb'),
+    'celebaembeddingstrainlmdb':
+    os.path.expanduser('datasets/celeba_embeddings_train.lmdb'),
+    'celebaembeddingstestlmdb':
+    os.path.expanduser('datasets/celeba_embeddings_test.lmdb'),
     'celebahq':
     os.path.expanduser('datasets/celebahq256.lmdb'),
     'horse256':
@@ -297,6 +305,38 @@ class TrainConfig(BaseConfig):
         elif self.data_name == 'celebalmdb':
             # always use d2c crop
             return CelebAlmdb(path=path or self.data_path,
+                              image_size=self.img_size,
+                              original_resolution=None,
+                              crop_d2c=True,
+                              **kwargs)
+        elif self.data_name == 'celebaattriblmdb':
+            # always use d2c crop
+            #import IPython; IPython.embed()
+            return CelebA_attrib_lmdb(path=path or self.data_path,
+                              image_size=self.img_size,
+                              original_resolution=None,
+                              crop_d2c=True,
+                              **kwargs)
+        elif self.data_name == 'celebaembeddingslmdb':
+            # always use d2c crop
+            #import IPython; IPython.embed()
+            return CelebA_attrib_lmdb(path=path or self.data_path,
+                              image_size=self.img_size,
+                              original_resolution=None,
+                              crop_d2c=True,
+                              **kwargs)
+        elif self.data_name == 'celebaembeddingstrainlmdb':
+            # always use d2c crop
+            #import IPython; IPython.embed()
+            return CelebA_attrib_lmdb(path=path or self.data_path,
+                              image_size=self.img_size,
+                              original_resolution=None,
+                              crop_d2c=True,
+                              **kwargs)
+        elif self.data_name == 'celebaembeddingstestlmdb':
+            # always use d2c crop
+            #import IPython; IPython.embed()
+            return CelebA_attrib_lmdb(path=path or self.data_path,
                               image_size=self.img_size,
                               original_resolution=None,
                               crop_d2c=True,
