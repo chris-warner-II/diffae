@@ -2,7 +2,7 @@ from enum import Enum
 
 import torch
 from torch import Tensor
-from torch.nn.functional import silu
+from torch.nn.functional import silu, normalize
 
 from .latentnet import *
 from .unet import *
@@ -152,15 +152,7 @@ class BeatGANsAutoencModel(BeatGANsUNetModel):
             if x is not None:
                 assert len(x) == len(x_start), f'{len(x)} != {len(x_start)}'
 
-            # BUG FIX from repo issue (CW)
-            #tmp = self.encode(x_start)
-            #cond = tmp['cond']
-            cond = self.encode(x_start) + 0.1*kwargs['embed']
-
-            #print('Inside unet_autoenc.BeatGANsAutoencModel.forward')
-            #import IPython; IPython.embed()
-
-            #cond = kwargs['embed']*0.001
+            cond = normalize(self.encode(x_start), p=2, dim=1) + kwargs['embed'] # condition on zsem + insightface_embedding both normed
 
         if t is not None:
             _t_emb = timestep_embedding(t, self.conf.model_channels)
