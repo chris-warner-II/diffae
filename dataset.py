@@ -147,7 +147,7 @@ class BaseLMDB_array(Dataset):
 
             embed_bytes = txn.get(key_embed)
             embed = np.frombuffer(embed_bytes, dtype=np.float32)
-            # Hardcoding float32 for now. May want to pass that in at some point.
+            embed_norm = embed / np.sqrt( (embed**2).sum() )
 
             #print('In dataset get item')
             #import IPython; IPython.embed()
@@ -155,7 +155,7 @@ class BaseLMDB_array(Dataset):
             img_bytes = txn.get(key)
             buffer = BytesIO(img_bytes)
             img = Image.open(buffer)
-            return img, torch.tensor(embed)
+            return img, torch.tensor(embed_norm)
 
 
 
